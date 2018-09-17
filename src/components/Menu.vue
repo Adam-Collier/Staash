@@ -8,7 +8,7 @@
                 <svg class="i-switch" @click="switchView" viewBox="0 0 22 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><g><path d="M7.318,13.223c-0.088,0 -0.161,-0.073 -0.161,-0.161l0,-2.974c0,-0.088 0.073,-0.161 0.161,-0.161l9.139,0c0.088,0 0.161,-0.073 0.161,-0.161l0,-2.405c0,-0.001 0,-0.003 0,-0.004c0,-0.113 0.092,-0.205 0.205,-0.205c0.056,0 0.11,0.023 0.149,0.064l4.245,4.24c0.03,0.03 0.047,0.071 0.047,0.114c0,0.043 -0.017,0.084 -0.047,0.114l-4.32,4.325c-0.03,0.031 -0.072,0.048 -0.115,0.048c-0.088,0 -0.161,-0.072 -0.161,-0.161c0,0 0,-0.001 0,-0.001l0,-2.51c0,0 0,-0.001 0,-0.001c0,-0.088 -0.073,-0.161 -0.161,-0.161c-0.001,0 -0.002,0 -0.003,0l-9.139,0Z" style="fill:#fff;"/><path d="M13.946,2.833c0.088,0 0.161,0.073 0.161,0.161l0,2.974c0,0.088 -0.073,0.161 -0.161,0.161l-9.139,0c-0.088,0 -0.161,0.073 -0.161,0.161l0,2.405c0,0.001 0,0.003 0,0.004c0,0.113 -0.092,0.205 -0.205,0.205c-0.056,0 -0.11,-0.023 -0.149,-0.064l-4.245,-4.24c-0.03,-0.03 -0.047,-0.071 -0.047,-0.114c0,-0.043 0.017,-0.084 0.047,-0.114l4.32,-4.325c0.03,-0.031 0.072,-0.048 0.115,-0.048c0.088,0 0.161,0.072 0.161,0.161c0,0 0,0.001 0,0.001l0,2.51c0,0 0,0.001 0,0.001c0,0.088 0.073,0.161 0.161,0.161c0.001,0 0.002,0 0.003,0l9.139,0Z" style="fill:#fff;"/></g></svg>
                 <svg class="i-search" @click="toggleSearch" viewBox="0 0 27 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule: evenodd; clip-rule: evenodd; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1.41421;"><circle cx="10.136" cy="10.136" r="7.56" style="fill: none; stroke-width: 2.97px; stroke: rgb(255, 255, 255);"></circle><path d="M15.884,15.014l7.869,7.87" style="fill: none; stroke-width: 2.97px; stroke: rgb(255, 255, 255);"></path></svg>
             </div>
-            <input class="search" placeholder="Search sites" type="text" aria-label="Search" autocomplete="off" spellcheck="false">
+            <input class="search" v-model="search" placeholder="Search sites" type="text" aria-label="Search" autocomplete="off" spellcheck="false">
         </div>
     </div>
 </template>
@@ -21,6 +21,11 @@ export default {
   components: {
     Links,
     SubmitSite
+  },
+  data() {
+    return {
+      search: ""
+    };
   },
   computed: {
     signedIn: function() {
@@ -45,7 +50,14 @@ export default {
       }
     },
     switchView: function() {
+      this.$store.commit("switchView");
       console.log("switch has been clicked");
+    }
+  },
+  watch: {
+    search: function(val) {
+      console.log(val);
+      this.$store.commit("filterSites", val);
     }
   }
 };
@@ -69,7 +81,7 @@ export default {
     z-index: 3
 
     svg
-        height: 20px
+        height: 18px
         cursor: pointer
         transition: all 200ms
 
@@ -77,6 +89,7 @@ export default {
             pointer-events: none
 
     .logo
+        height: 24px
         position: absolute
         top: 50%
         left: 50%
@@ -94,19 +107,19 @@ export default {
     position: absolute
     background: #1D1D1D
     width: 100%
-    height: 45px
+    height: 55px
     box-sizing: border-box
     border: none
     border-radius: 5px
     font-weight: 500
     font-size: 16px
-    padding: 0 0 1px 28px
+    padding-left: 28px
     color: #FFFFFF
-    transform: translateY(-10px)
+    transform: translateY(-2px)
     transition: all 200ms
     opacity: 0
     left: 0
-    top: 75px
+    top: 65px
     z-index: -1
 
     &:placeholder
@@ -115,7 +128,8 @@ export default {
 .reveal
     transform: translateY(0)
     opacity: 1
-    z-index: 1
+    z-index: -5
+    pointer-events: auto
 
 .close
     transform: rotate(45deg)
