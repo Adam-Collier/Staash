@@ -1,11 +1,16 @@
 <template>
     <div class="nav">
       <template v-if="this.$store.state.signedIn">
-        <a href="profile">Profile</a>
-        <a @click.prevent="signOut()">Logout</a>
+        <template v-if="this.$route.name == 'home'">
+          <router-link to="profile">Profile</router-link>
+          <router-link to="/" @click.native="signOut()">Logout</router-link>
+        </template>
+        <template v-else>
+          <router-link to="/">Home</router-link>
+          <router-link to="/" @click.native="signOut()">Logout</router-link>
+        </template>
       </template>
       <template v-else>
-        <a href="profile">Profile</a>
         <a href="http://localhost:3001/login">Login</a>
       </template>
     </div>
@@ -15,6 +20,7 @@
 export default {
   methods: {
     signOut() {
+      localStorage.removeItem("staashToken");
       this.$store.commit("signOut");
     }
   }
