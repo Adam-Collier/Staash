@@ -11,6 +11,16 @@ import Mobile from "@/components/Mobile.vue";
 export default {
   components: {
     Mobile
+  },
+  beforeMount: function() {
+    if (window.location.search) {
+      let searchParams = new URLSearchParams(window.location.search.slice(1));
+      let token = searchParams.get("token");
+      localStorage.setItem("staashToken", token);
+    }
+    if (localStorage.getItem("staashToken")) {
+      this.$store.commit("signIn");
+    }
   }
 };
 </script>
@@ -22,7 +32,7 @@ export default {
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
   color: #2c3e50
-  padding-top: 30px
+  padding-top: 15px
 
 #nav
   padding: 30px
