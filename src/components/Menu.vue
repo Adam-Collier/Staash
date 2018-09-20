@@ -9,7 +9,9 @@
                 <svg class="i-search" @click="toggleSearch" viewBox="0 0 27 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule: evenodd; clip-rule: evenodd; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1.41421;"><circle cx="10.136" cy="10.136" r="7.56" style="fill: none; stroke-width: 2.97px; stroke: rgb(255, 255, 255);"></circle><path d="M15.884,15.014l7.869,7.87" style="fill: none; stroke-width: 2.97px; stroke: rgb(255, 255, 255);"></path></svg>
             </div>
             <input class="search" v-model="search" placeholder="Search sites" type="text" aria-label="Search" autocomplete="off" spellcheck="false">
+            <div class="progress"></div>
         </div>
+        
     </div>
 </template>
 
@@ -52,6 +54,10 @@ export default {
     switchView: function() {
       this.$store.commit("switchView");
       console.log("switch has been clicked");
+    },
+    handleScroll(event) {
+      console.log(event);
+      console.log("scrolling");
     }
   },
   watch: {
@@ -65,72 +71,83 @@ export default {
 
 <style lang="stylus">
 .header
-    width: 440px
-    margin: 0 auto
+  width: 440px
+  margin: 0 auto
 
 .navbar
-    background: #363636
-    padding: 0px 30px
-    height: 60px
-    border-radius: 5px
-    position: relative
-    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2)
+  background: #363636
+  padding: 0px 30px
+  height: 60px
+  border-radius: 5px
+  position: relative
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2)
+  display: flex
+  justify-content: space-between
+  align-items: center
+  z-index: 3
+
+  svg
+    height: 18px
+    cursor: pointer
+    transition: all 200ms
+
+    path
+      pointer-events: none
+
+  .logo
+    height: 24px
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+
+  >div
     display: flex
-    justify-content: space-between
     align-items: center
-    z-index: 3
 
-    svg
-        height: 18px
-        cursor: pointer
-        transition: all 200ms
-
-        path
-            pointer-events: none
-
-    .logo
-        height: 24px
-        position: absolute
-        top: 50%
-        left: 50%
-        transform: translate(-50%, -50%)
-
-    >div
-        display: flex
-        align-items: center
-
-        &:last-of-type
-            svg
-                padding-left: 15px
+    &:nth-of-type(2)
+      svg
+        padding-left: 15px
 
 .search
-    position: absolute
-    background: #1D1D1D
-    width: 100%
-    height: 55px
-    box-sizing: border-box
-    border: none
-    border-radius: 5px
-    font-weight: 500
-    font-size: 16px
-    padding-left: 28px
-    color: #FFFFFF
-    transform: translateY(-2px)
-    transition: all 200ms
-    opacity: 0
-    left: 0
-    top: 65px
-    z-index: -1
+  position: absolute
+  background: #1D1D1D
+  width: 100%
+  height: 55px
+  box-sizing: border-box
+  border: none
+  border-radius: 5px
+  font-weight: 500
+  font-size: 16px
+  padding-left: 28px
+  color: #FFFFFF
+  transform: translateY(-2px)
+  transition: all 200ms
+  opacity: 0
+  left: 0
+  top: 65px
+  z-index: -1
 
-    &:placeholder
-        color: #B1B1B1
+  &:placeholder
+    color: #B1B1B1
 
 .reveal
-    transform: translateY(0)
-    opacity: 1
-    z-index: -5
-    pointer-events: auto
+  transform: translateY(0)
+  opacity: 1
+  z-index: -5
+  pointer-events: auto
 
 .close
-    transform: rotate(45deg)
+  transform: rotate(45deg)
+
+.progress
+  background: linear-gradient(to right, green var(--scroll), transparent 0)
+  background-repeat: no-repeat
+  position: absolute
+  bottom: 0
+  left: 0
+  width: 440px
+  height: 4px
+  z-index: 3
+  border-radius: 0 0 5px 5px
 </style>
