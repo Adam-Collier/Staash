@@ -18,10 +18,9 @@ export default new Vuex.Store({
       state.signedIn = true;
     },
     fetchSites(state) {
-      let token = localStorage.getItem("staashToken");
       return fetch("http://localhost:3001/api", {
         headers: new Headers({
-          token: token
+          token: localStorage.getItem("staashToken")
         })
       })
         .then(response => {
