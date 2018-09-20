@@ -1,14 +1,14 @@
 <template>
-  <div class="sites" v-if="this.sites">
-      <a class="site" v-for="site in sites" :key="site.id" :href="site.siteUrl">
+  <div class="sites" v-if="this.sites" @scroll="scrollProgress">
+      <a class="site" :class="{ mobile: !$store.state.desktop }" v-for="site in sites" :key="site.id" :href="site.siteUrl">
         <div>
-          <h1>{{site.siteTitle}}</h1>  
+          <h3>{{site.siteTitle}}</h3>  
           <img :src="QRCode(site.siteUrl)" v-if="$store.state.desktop" alt="">
         </div>
         <img :src="$store.state.desktop ? site.desktopImage : site.mobileImage" alt="" />
         <div>
           <p>{{site.date}}</p>
-          <p>Added by {{site.author}}</p>
+          <p>{{site.author}}</p>
         </div>
       </a>
   </div>
@@ -16,7 +16,6 @@
 
 <script>
 import QRCode from "qrcode";
-
 export default {
   beforeCreate: function() {
     this.$store.dispatch("getSites");
@@ -43,6 +42,15 @@ export default {
         qr = code;
       });
       return qr;
+    },
+    scrollProgress(event) {
+      let sites = event.target;
+      let left = sites.scrollLeft;
+      let width = sites.scrollWidth;
+      let progress = document.querySelector(".progress");
+      // eslint-disable-next-line
+      let scroll = left / (width - document.documentElement.clientWidth) * 100;
+      progress.style.setProperty("--scroll", scroll + "%");
     }
   }
 };
@@ -57,7 +65,7 @@ export default {
   -webkit-overflow-scrolling: touch
   white-space: nowrap
   padding-left: 35px
-  padding-top: 6vh
+  padding-top: 5vh
 
 .site
   display: inline-block
@@ -74,8 +82,11 @@ export default {
       padding-bottom: 18px
       padding: 10px 10px 10px 20px
 
+      h3
+        margin: 0
+
       img
-        width: 45px
+        width: 35px
         z-index: 0
 
     &:last-of-type, &:first-of-type
