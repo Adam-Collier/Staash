@@ -18,7 +18,7 @@
 import QRCode from "qrcode";
 export default {
   beforeCreate: function() {
-    this.$store.dispatch("getSites");
+    this.$store.dispatch("getTeamSites");
   },
   computed: {
     sites() {
@@ -56,10 +56,10 @@ export default {
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .sites
   width: calc(100vw - 35px)
-  height: calc(100vh - 106px)
+  height: calc(100vh - 142px)
   overflow-x: auto
   overflow-y: visible
   -webkit-overflow-scrolling: touch
@@ -67,42 +67,50 @@ export default {
   padding-left: 35px
   padding-top: 5vh
 
-.site
-  display: inline-block
-  vertical-align: top
-  margin-right: 50px
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15)
-  border-radius: 5px
+  &::-webkit-scrollbar
+    display: none
 
-  &:hover
-    text-decoration: none
+  .site
+    display: inline-block
+    vertical-align: top
+    margin-right: 50px
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15)
+    border-radius: 5px
 
-  div
-    &:first-of-type
-      padding-bottom: 18px
-      padding: 10px 10px 10px 20px
+    &:hover
+      text-decoration: none
 
-      h3
-        margin: 0
+    div
+      &:first-of-type
+        padding-bottom: 18px
+        padding: 10px 10px 10px 20px
 
-      img
-        width: 35px
-        z-index: 0
+        h3
+          margin: 0
 
-    &:last-of-type, &:first-of-type
-      display: flex
-      align-items: center
-      justify-content: space-between
+        img
+          width: 35px
+          z-index: 0
 
-    &:last-of-type
-      padding: 15px 15px 12px 20px
+      &:last-of-type, &:first-of-type
+        display: flex
+        align-items: center
+        justify-content: space-between
 
-  >img
-    height: 60vh
-    border-top: 1px solid #ebebeb
-    border-bottom: 1px solid #ebebeb
-    display: block
+      &:last-of-type
+        padding: 15px 15px 12px 20px
 
-  p
-    margin: 0
+    >img
+      height: 60vh
+      width: 101.21vh
+      border-top: 1px solid #ebebeb
+      border-bottom: 1px solid #ebebeb
+      display: block
+
+    p
+      margin: 0
+
+  .mobile
+    >img
+      width: auto
 </style>
