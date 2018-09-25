@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     signedIn: false,
     sites: "",
+    userSites: "",
     filterBy: "",
     desktop: true
   },
@@ -17,10 +18,27 @@ export default new Vuex.Store({
     signIn(state) {
       state.signedIn = true;
     },
-    fetchSites(state) {
+    teamSites(state) {
       return fetch("http://localhost:3001/api", {
         headers: new Headers({
-          token: localStorage.getItem("staashToken")
+          token: localStorage.getItem("staashToken"),
+          type: "team"
+        })
+      })
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+          state.sites = data;
+        })
+        .catch(err => console.log(err));
+    },
+    userSites(state) {
+      return fetch("http://localhost:3001/api", {
+        headers: new Headers({
+          token: localStorage.getItem("staashToken"),
+          type: "user"
         })
       })
         .then(response => {
@@ -40,8 +58,11 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    getSites(context) {
-      context.commit("fetchSites");
+    getTeamSites(context) {
+      context.commit("teamSites");
+    },
+    getUserSites(context) {
+      context.commit("userSites");
     }
   }
 });
