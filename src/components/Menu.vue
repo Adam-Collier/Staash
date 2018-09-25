@@ -54,10 +54,6 @@ export default {
     switchView: function() {
       this.$store.commit("switchView");
       console.log("switch has been clicked");
-    },
-    handleScroll(event) {
-      console.log(event);
-      console.log("scrolling");
     }
   },
   watch: {
