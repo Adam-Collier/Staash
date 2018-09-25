@@ -141,7 +141,7 @@ export default {
         }),
         body: JSON.stringify({ ...this.enteredValues })
       }).then(response => {
-        this.$store.dispatch("getSites");
+        this.$store.dispatch("getTeamSites");
         console.log(response);
       });
     }
