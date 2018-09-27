@@ -18,11 +18,11 @@
 import QRCode from "qrcode";
 export default {
   beforeCreate: function() {
-    this.$store.dispatch("getTeamSites");
+    this.$store.dispatch("getSites");
   },
   computed: {
     sites() {
-      let sites = Array.from(this.$store.state.sites);
+      let sites = Array.from(this.$store.state.teamSites);
       return sites.filter(sites => {
         return sites.siteTitle
           .toLowerCase()
