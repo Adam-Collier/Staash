@@ -6,7 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     signedIn: false,
-    sites: "",
+    teamSites: "",
     userSites: "",
     filterBy: "",
     desktop: true
@@ -18,11 +18,10 @@ export default new Vuex.Store({
     signIn(state) {
       state.signedIn = true;
     },
-    teamSites(state) {
+    getSites(state) {
       return fetch("http://localhost:3001/api", {
         headers: new Headers({
-          token: localStorage.getItem("staashToken"),
-          type: "team"
+          token: localStorage.getItem("staashToken")
         })
       })
         .then(response => {
@@ -30,23 +29,7 @@ export default new Vuex.Store({
         })
         .then(data => {
           console.log(data);
-          state.sites = data;
-        })
-        .catch(err => console.log(err));
-    },
-    userSites(state) {
-      return fetch("http://localhost:3001/api", {
-        headers: new Headers({
-          token: localStorage.getItem("staashToken"),
-          type: "user"
-        })
-      })
-        .then(response => {
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-          state.sites = data;
+          ({ teamSites: state.teamSites, userSites: state.userSites } = data);
         })
         .catch(err => console.log(err));
     },
@@ -58,11 +41,8 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    getTeamSites(context) {
-      context.commit("teamSites");
-    },
-    getUserSites(context) {
-      context.commit("userSites");
+    getSites(context) {
+      context.commit("getSites");
     }
   }
 });
