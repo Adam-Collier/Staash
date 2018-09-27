@@ -34,11 +34,11 @@ export default {
     Menu
   },
   beforeCreate: function() {
-    this.$store.dispatch("getUserSites");
+    this.$store.dispatch("getSites");
   },
   computed: {
     sites() {
-      let sites = Array.from(this.$store.state.sites);
+      let sites = Array.from(this.$store.state.userSites);
       return sites;
     }
   },
@@ -74,8 +74,7 @@ export default {
         }),
         body: JSON.stringify({ id: id })
       }).then(() => {
-        this.$store.dispatch("getTeamSites");
-        this.$store.dispatch("getUserSites");
+        this.$store.dispatch("getSites");
       });
     }
   }
