@@ -63,9 +63,18 @@ export default {
             if (status === 200) {
               this.$set(this.enteredValues, "siteUrl", e.target.value);
 
-              let values = { ...this.enteredValues };
               this.loader = false;
-              this.$emit("isAdd", false);
+              let values = { ...this.enteredValues };
+              this.$emit("isAdd");
+
+              setTimeout(() => {
+                this.$emit("message", {
+                  show: true,
+                  message: "Grabbing your site\xa0\xa0👍",
+                  success: true,
+                  loader: true
+                });
+              }, 200);
 
               fetch("http://localhost:3001/api", {
                 method: "post",
@@ -76,6 +85,12 @@ export default {
                 body: JSON.stringify(values)
               }).then(response => {
                 this.$store.dispatch("getSites");
+                this.$emit("message", {
+                  show: false,
+                  message: "",
+                  success: false,
+                  loader: false
+                });
                 console.log(response);
               });
             } else {
@@ -96,7 +111,6 @@ export default {
   },
   watch: {
     isAdd: function(val) {
-      // watch it
       if (!val) {
         this.enteredValues = {};
         this.active = 0;
@@ -109,8 +123,6 @@ export default {
   directives: {
     focus: {
       componentUpdated: function(el, binding) {
-        //  `binding.value` is the result of the expression passed to the directive.
-        //  In this case if it's true, the textfield should be focused.
         if (binding.value) {
           el.focus();
         }
@@ -128,7 +140,7 @@ export default {
   white-space: nowrap
   opacity: 0
   transition: all 200ms ease-in-out
-  transform: translateY(-2px)
+  transform: translateY(-5px)
   z-index: -1
   pointer-events: none
 
