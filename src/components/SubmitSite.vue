@@ -1,87 +1,52 @@
 <template>
-    <div>
-        <svg class="i-add" @click="showAdd" viewBox="0 0 931 931" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.41421;height:16px;"><g><path d="M465.131,47.631l0,835" style="fill:none;stroke-width:130px;stroke:#fff;"/><path d="M882.631,465.131l-835,0" style="fill:none;stroke-width:130px;stroke:#fff;"/></g></svg>
-        <div class="submit-site">
-            <div class="enter active">
-                <h4>What's the name of the site?</h4>
-                <input tabindex="1" v-on:keyup.enter="firstSubmit" type="text">
-                <p>Hit ENTER when you're ready</p>
-            </div>
-            <div class="enter">
-                <h4>Whats the site URL?</h4>
-                <input type="text" data-url v-on:keyup.enter="secondSubmit">
-                <div class="loader"></div>
-                <p>Hit ENTER when you're ready</p>
-            </div>
-            <div class="enter submit" tabindex='1' v-on:keyup.enter="finalSubmit">
-                <div>
-                    <h4>Hit enter to grab your site 👍</h4>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="submit-site">
+      <div class="enter" :class="{slide: slide, active: active == 0}">
+          <h4>What's the name of the site?</h4>
+          <input v-on:keyup.enter="firstSubmit" type="text" v-focus="active === 0 && isAdd">
+          <p>Hit ENTER when you're ready</p>
+      </div>
+      <div class="enter" :class="{slide: slide, active: active == 1}">
+          <h4>Whats the site URL?</h4>
+          <input type="text" v-on:keyup.enter="secondSubmit" v-focus="active === 1">
+          <div class="loader" :class="{'loader-show': loader}"></div>
+          <p>Hit ENTER to Staash your site</p>
+      </div>
+  </div>
 </template>
 
 <script>
 export default {
   data: function() {
     return {
-      validSite: "",
-      siteUrl: "",
-      enteredValues: {}
+      enteredValues: {},
+      slide: false,
+      loader: false,
+      active: 0
     };
   },
+  props: {
+    isAdd: Boolean
+  },
   methods: {
-    showAdd: function(e) {
-      if (e.target.classList.contains("close")) {
-        document.querySelector(".reveal").classList.remove("reveal");
-        document.querySelector(".close").classList.remove("close");
-        setTimeout(() => {
-          document.querySelectorAll(".enter").forEach((x, i) => {
-            i === 0 ? x.classList.add("active") : x.classList.remove("active");
-            x.style.transform = "translateX(0)";
-          });
-        }, 300);
-      } else {
-        e.target.classList.add("close");
-        this.enteredValues = {};
-
-        let submitSite = document.querySelector(".submit-site");
-        submitSite.classList.add("reveal");
-        submitSite.querySelector("div > input").focus();
-      }
-      console.log("add has been clicked");
-    },
     firstSubmit: function(e) {
-      this.$set(this.enteredValues, "siteTitle", e.target.value);
-
-      let card = e.target.parentElement;
-
-      let index = Array.from(card.parentElement.children).indexOf(
-        e.target.parentElement
-      );
-
-      card.classList.remove("active");
-      card.nextSibling.classList.add("active");
-      card.nextSibling.querySelector("input").focus();
-
-      document.querySelectorAll(".enter").forEach(x => {
-        x.style.transform = `translateX(${(index + 1) * -455}px)`;
-      });
-
-      return;
+      if (e.target.value == "") {
+        this.invalidValue(e.target);
+      } else {
+        this.$set(this.enteredValues, "siteTitle", e.target.value);
+        this.active = 1;
+        this.slide = true;
+        return;
+      }
     },
     secondSubmit: function(e) {
       let input = e.target;
-      let card = e.target.parentElement;
 
       if (
         input.value.match(
           /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/
         )
       ) {
-        let loader = document.querySelector(".loader");
-        loader.classList.add("loader-show");
+        this.loader = true;
 
         fetch("http://localhost:3001/check-url", {
           method: "post",
@@ -98,52 +63,58 @@ export default {
             if (status === 200) {
               this.$set(this.enteredValues, "siteUrl", e.target.value);
 
-              loader.classList.remove("loader-show");
-              card.classList.remove("active");
-              card.nextSibling.classList.add("active");
-              document.querySelectorAll(".enter").forEach(x => {
-                x.style.transform = `translateX(${2 * -455}px)`;
+              let values = { ...this.enteredValues };
+              this.loader = false;
+              this.$emit("isAdd", false);
+
+              fetch("http://localhost:3001/api", {
+                method: "post",
+                headers: new Headers({
+                  "Content-Type": "application/json",
+                  token: localStorage.getItem("staashToken")
+                }),
+                body: JSON.stringify(values)
+              }).then(response => {
+                this.$store.dispatch("getSites");
+                console.log(response);
               });
-              input.parentElement.nextSibling.focus();
             } else {
-              loader.classList.remove("loader-show");
-              input.classList.add("error");
-              input.addEventListener("webkitAnimationEnd", function() {
-                input.classList.remove("error");
-              });
+              this.loader = false;
+              this.invalidValue(input);
             }
           });
       } else {
-        input.classList.add("error");
-        input.addEventListener("webkitAnimationEnd", function() {
-          input.classList.remove("error");
-        });
+        this.invalidValue(input);
       }
     },
-    finalSubmit: function() {
-      console.log("this is the final");
-      console.log({ ...this.enteredValues });
-
-      document.querySelector(".reveal").classList.remove("reveal");
-      document.querySelector(".close").classList.remove("close");
-      setTimeout(() => {
-        document.querySelectorAll(".enter").forEach((x, i) => {
-          i === 0 ? x.classList.add("active") : x.classList.remove("active");
-          x.style.transform = "translateX(0)";
-        });
-      }, 300);
-
-      fetch("http://localhost:3001/api", {
-        method: "post",
-        headers: new Headers({
-          "Content-Type": "application/json",
-          token: localStorage.getItem("staashToken")
-        }),
-        body: JSON.stringify({ ...this.enteredValues })
-      }).then(response => {
-        this.$store.dispatch("getSites");
-        console.log(response);
+    invalidValue: function(el) {
+      el.classList.add("error");
+      el.addEventListener("webkitAnimationEnd", function() {
+        el.classList.remove("error");
       });
+    }
+  },
+  watch: {
+    isAdd: function(val) {
+      // watch it
+      if (!val) {
+        this.enteredValues = {};
+        this.active = 0;
+        setTimeout(() => {
+          this.slide = false;
+        }, 200);
+      }
+    }
+  },
+  directives: {
+    focus: {
+      componentUpdated: function(el, binding) {
+        //  `binding.value` is the result of the expression passed to the directive.
+        //  In this case if it's true, the textfield should be focused.
+        if (binding.value) {
+          el.focus();
+        }
+      }
     }
   }
 };
@@ -163,6 +134,7 @@ export default {
 
   .active
     opacity: 1
+    user-select: all
 
 .enter
   background: #1D1D1D
@@ -248,6 +220,9 @@ export default {
 
 .loader-show
   opacity: 1
+
+.slide
+  transform: translateX(-455px)
 
 @keyframes shake
   10%, 90%
