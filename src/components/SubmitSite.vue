@@ -2,12 +2,12 @@
   <div class="submit-site">
       <div class="enter" :class="{slide: slide, active: active == 0}">
           <h4>What's the name of the site?</h4>
-          <input v-on:keyup.enter="firstSubmit" type="text" v-focus="active === 0 && isAdd">
+          <input v-on:keyup.enter="firstSubmit" type="text" v-focus="active === 0 && isAdd" v-model="enteredValues.siteTitle">
           <p>Hit ENTER when you're ready</p>
       </div>
       <div class="enter" :class="{slide: slide, active: active == 1}">
-          <h4>Whats the site URL?</h4>
-          <input type="text" v-on:keyup.enter="secondSubmit" v-focus="active === 1">
+          <h4>What's the site URL?</h4>
+          <input type="text" v-on:keyup.enter="secondSubmit" v-focus="active === 1" v-model="enteredValues.siteUrl">
           <div class="loader" :class="{'loader-show': loader}"></div>
           <p>Hit ENTER to Staash your site</p>
       </div>
@@ -32,17 +32,14 @@ export default {
       if (e.target.value == "") {
         this.invalidValue(e.target);
       } else {
-        this.$set(this.enteredValues, "siteTitle", e.target.value);
         this.active = 1;
         this.slide = true;
         return;
       }
     },
     secondSubmit: function(e) {
-      let input = e.target;
-
       if (
-        input.value.match(
+        this.enteredValues.siteUrl.match(
           /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/
         )
       ) {
@@ -54,15 +51,13 @@ export default {
             Accept: "application/json",
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ u: e.target.value })
+          body: JSON.stringify({ u: this.enteredValues.siteUrl })
         })
           .then(response => {
             return response.status;
           })
           .then(status => {
             if (status === 200) {
-              this.$set(this.enteredValues, "siteUrl", e.target.value);
-
               this.loader = false;
               let values = { ...this.enteredValues };
               this.$emit("isAdd");
@@ -91,15 +86,16 @@ export default {
                   success: false,
                   loader: false
                 });
+                this.enteredValues = {};
                 console.log(response);
               });
             } else {
               this.loader = false;
-              this.invalidValue(input);
+              this.invalidValue(e.target);
             }
           });
       } else {
-        this.invalidValue(input);
+        this.invalidValue(e.target);
       }
     },
     invalidValue: function(el) {
