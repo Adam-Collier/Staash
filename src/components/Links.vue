@@ -1,14 +1,9 @@
 <template>
     <div class="nav">
       <template v-if="this.$store.state.signedIn">
-        <template v-if="this.$route.name == 'home'">
-          <router-link to="profile">Profile</router-link>
+          <router-link to="profile" v-if="this.$route.name == 'home'">Profile</router-link>
+          <router-link to="/" v-else >Home</router-link>
           <router-link to="/" @click.native="signOut()">Logout</router-link>
-        </template>
-        <template v-else>
-          <router-link to="/">Home</router-link>
-          <router-link to="/" @click.native="signOut()">Logout</router-link>
-        </template>
       </template>
       <template v-else>
         <a href="http://localhost:3001/login">Login</a>
